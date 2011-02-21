@@ -1,0 +1,16 @@
+div#comment-view {
+	padding: 5px;
+	font-size: 9pt;
+	font-family: tahoma;
+	background-color: #CCC;
+	margin-bottom: 5px;
+}
+
+.comment-writtenby {
+	float: left; 
+	margin: 0px 10px 10px 0px;
+}
+
+.comment-createdtime {
+	margin: 0px 0px 10px 0px;
+}

@@ -1,0 +1,14 @@
+#comment-form {
+	padding:10px 5px 0px 0px;
+	font-size:11px;
+}
+#comment-form .row {
+	margin-bottom:5px;
+}
+#comment-form .row textarea { 
+	width:100%;
+}
+#comment-form .textfield {
+	width:200px;
+}
+

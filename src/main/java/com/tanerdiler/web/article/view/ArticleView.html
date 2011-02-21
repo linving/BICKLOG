@@ -1,0 +1,21 @@
+<wicket:panel>
+<div id="article-view">
+<h1><span wicket:id="article-title">[article-title]</span></h1>
+<div class="info">
+<div class="article-left-toolbar">
+<div wicket:id="article-writtenby" class="author">[article-writtenby]</div>
+<div wicket:id="article-writtenon" class="date">[article-writtenon]</div>
+</div>
+<div class="article-right-toolbar"><span class="comments"><a href="#comment-view"><span wicket:id="article-commentcount">[article-commentcount]</span> <wicket:message key="label.big.comments"/></a></span>
+<span class="addcomment"><a href="#comment-form"><wicket:message key="label.leave.comment"/></a></span></div>
+</div>
+<div class="article-fulltext">
+<span wicket:id="article-fulltext">[article-fulltext]</span>
+</div>
+<div class="article-footer">
+	<div class="views"><span wicket:id="article-viewcount">[article-viewcount]</span> <wicket:message key="label.views"/></div> 
+	<div class="ratingpanel"><span wicket:id="article-rating-panel"></span></div> 
+</div>
+<div style="clear: left;"></div>
+</div>
+</wicket:panel>

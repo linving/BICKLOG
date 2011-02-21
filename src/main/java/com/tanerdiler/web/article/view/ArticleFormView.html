@@ -1,0 +1,15 @@
+<wicket:panel>
+<form wicket:id="article-form" method="post" class="article-form">
+<div wicket:id="feedbackpanel"></div>
+<wicket:message key="article.title"/> : <input type="text" name="title" class="textfield" wicket:id="article-form-title"/><br />
+<wicket:message key="article.category"/> : <select name="category" wicket:id="article-form-category"/><br />
+<wicket:message key="article.introtext"/> : <textarea name="introText" wicket:id="article-form-intro" style="width: 100%; height: 100px;"></textarea><br />
+<wicket:message key="article.fulltext"/>  : <textarea name="fullText" wicket:id="article-form-full"></textarea><br />
+<wicket:message key="article.tags"/>  : <input type="text" name="tags" class="textfield" wicket:id="article-form-tags"/><br />
+<div id="submitbox">
+	<div class="submitbutton">
+		<input type="submit" class="button" wicket:id="article-form-submit"/>
+	</div>
+</div>
+</form>
+</wicket:panel>

@@ -1,0 +1,509 @@
+-- MySQL dump 10.13  Distrib 5.1.38, for Win32 (ia32)
+--
+-- Host: localhost    Database: tanerdiler
+-- ------------------------------------------------------
+-- Server version	5.1.38-community
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `article`
+--
+
+DROP TABLE IF EXISTS `article`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `article` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `AUTHOR_ID` int(11) NOT NULL,
+  `CATEGORY_ID` int(11) DEFAULT NULL,
+  `TITLE` varchar(255) NOT NULL,
+  `INTRO_TEXT` varchar(500) DEFAULT NULL,
+  `FULL_TEXT` longtext,
+  `CREATED_TIME` datetime NOT NULL,
+  `VIEW_COUNT` int(10) unsigned DEFAULT '0',
+  `RATING` float DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  KEY `FK_ARTICLE_AUTHOR` (`AUTHOR_ID`),
+  KEY `FK_ARTICLE_CATEGORY` (`CATEGORY_ID`),
+  CONSTRAINT `FK_ARTICLE_AUTHOR` FOREIGN KEY (`AUTHOR_ID`) REFERENCES `person` (`ID`),
+  CONSTRAINT `FK_ARTICLE_CATEGORY` FOREIGN KEY (`CATEGORY_ID`) REFERENCES `category` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `article`
+--
+
+LOCK TABLES `article` WRITE;
+/*!40000 ALTER TABLE `article` DISABLE KEYS */;
+/*!40000 ALTER TABLE `article` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `category`
+--
+
+DROP TABLE IF EXISTS `category`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `category` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `PARENT_ID` int(11) DEFAULT NULL,
+  `NAME` varchar(50) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_CATEGORY_PARENT` (`PARENT_ID`),
+  CONSTRAINT `FK_CATEGORY_PARENT` FOREIGN KEY (`PARENT_ID`) REFERENCES `category` (`ID`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `category`
+--
+
+LOCK TABLES `category` WRITE;
+/*!40000 ALTER TABLE `category` DISABLE KEYS */;
+INSERT INTO `category` VALUES (1,NULL,'Blog'),(2,1,'Java'),(3,1,'Wicket'),(4,1,'Design Patterns'),(5,1,'Spring');
+/*!40000 ALTER TABLE `category` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comment`
+--
+
+DROP TABLE IF EXISTS `comment`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `comment` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `PERSON_ID` int(11) DEFAULT NULL,
+  `COMMENT` text NOT NULL,
+  `CREATED_TIME` datetime NOT NULL,
+  `ENTITY_ID` int(11) NOT NULL,
+  `ENTITY_TYPE` varchar(15) NOT NULL,
+  `PARENT_ID` int(11) DEFAULT NULL,
+  `AUTHOR_ID` int(11) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_COMMENT_ENTITY_TYPE` (`ENTITY_TYPE`),
+  KEY `FK_COMMENT_PARENT` (`PARENT_ID`),
+  KEY `FK_COMMENT_PERSON_ID` (`PERSON_ID`),
+  KEY `FK_COMMENT_AUTHOR_ID` (`AUTHOR_ID`),
+  CONSTRAINT `FK_COMMENT_AUTHOR_ID` FOREIGN KEY (`AUTHOR_ID`) REFERENCES `comment_author` (`ID`),
+  CONSTRAINT `FK_COMMENT_ENTITY_TYPE` FOREIGN KEY (`ENTITY_TYPE`) REFERENCES `entity_type` (`TYPE`),
+  CONSTRAINT `FK_COMMENT_PARENT` FOREIGN KEY (`PARENT_ID`) REFERENCES `comment` (`ID`) ON DELETE SET NULL,
+  CONSTRAINT `FK_COMMENT_PERSON_ID` FOREIGN KEY (`PERSON_ID`) REFERENCES `person` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comment`
+--
+
+LOCK TABLES `comment` WRITE;
+/*!40000 ALTER TABLE `comment` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `comment_author`
+--
+
+DROP TABLE IF EXISTS `comment_author`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `comment_author` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `FIRSTNAME` varchar(50) NOT NULL,
+  `LASTNAME` varchar(50) NOT NULL,
+  `EMAIL` varchar(100) NOT NULL,
+  `WEBSITE` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `comment_author`
+--
+
+LOCK TABLES `comment_author` WRITE;
+/*!40000 ALTER TABLE `comment_author` DISABLE KEYS */;
+/*!40000 ALTER TABLE `comment_author` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `databasechangelog`
+--
+
+DROP TABLE IF EXISTS `databasechangelog`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `databasechangelog` (
+  `ID` varchar(63) NOT NULL,
+  `AUTHOR` varchar(63) NOT NULL,
+  `FILENAME` varchar(200) NOT NULL,
+  `DATEEXECUTED` datetime NOT NULL,
+  `MD5SUM` varchar(32) DEFAULT NULL,
+  `DESCRIPTION` varchar(255) DEFAULT NULL,
+  `COMMENTS` varchar(255) DEFAULT NULL,
+  `TAG` varchar(255) DEFAULT NULL,
+  `LIQUIBASE` varchar(10) DEFAULT NULL,
+  PRIMARY KEY (`ID`,`AUTHOR`,`FILENAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `databasechangelog`
+--
+
+LOCK TABLES `databasechangelog` WRITE;
+/*!40000 ALTER TABLE `databasechangelog` DISABLE KEYS */;
+INSERT INTO `databasechangelog` VALUES ('TDS-1','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:26','3d2f20744d3472f65a72c14a6b9f54','SQL From File','DB DDL',NULL,'1.9.5'),('TDS-10','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:28','1ec82c7437354517ce8951bb26a7b863','Custom SQL','',NULL,'1.9.5'),('TDS-11','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:28','7f5989b08477139817d83d55751f61e5','Custom SQL','',NULL,'1.9.5'),('TDS-12','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:28','ab2dc7d7c4dfc33e90e17ac41f73','Custom SQL','',NULL,'1.9.5'),('TDS-13','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:29','b77d73818320826a3d42c2706ced6866','Custom SQL (x2)','',NULL,'1.9.5'),('TDS-14','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:29','47f3785417a9bbebefee52c7799c59d','Custom SQL (x3)','',NULL,'1.9.5'),('TDS-15','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:29','a3715365bc8e4429b3f12171be1d361e','Custom SQL','',NULL,'1.9.5'),('TDS-16','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:29','d59d62533ce7d7474aab4c1eb2f8b46','Custom SQL','',NULL,'1.9.5'),('TDS-18','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','666794239a4f44c734dfb8ab5882','Custom SQL (x2)','',NULL,'1.9.5'),('TDS-19','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','090ad681a641503cce1a5277bc85c4','Custom SQL','',NULL,'1.9.5'),('TDS-2','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:26','e6fce9cffc2fa763ef25fb873de017fb','Custom SQL','composite key yapilmasi gerekiyordu',NULL,'1.9.5'),('TDS-20','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','52a519fd7464356bc8da6ba2392f8cc','Custom SQL','',NULL,'1.9.5'),('TDS-21','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','3b66733d266bc9743660d9abbbc28e5d','Custom SQL','',NULL,'1.9.5'),('TDS-22','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','84de3cd88553aad86fb7a735dd35dd','Custom SQL','',NULL,'1.9.5'),('TDS-23','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:30','7113dbfede8eab8fe240e72a5fa5ca72','Custom SQL','',NULL,'1.9.5'),('TDS-24','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:31','57182f9587ef68ead9bad4317e1eb3','Custom SQL (x2)','',NULL,'1.9.5'),('TDS-3','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:26','1a9345a5a75520239e95cdd4c7b45fc6','Custom SQL','',NULL,'1.9.5'),('TDS-4','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:26','4f23b6c92473ca23d4cad4a83997f2d','Custom SQL','',NULL,'1.9.5'),('TDS-5','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:27','d51e71046e1a9734c245041e83c39a5','Custom SQL','',NULL,'1.9.5'),('TDS-6','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:27','4e134fcd351a96d18c61da95f7b7faa','Custom SQL','',NULL,'1.9.5'),('TDS-7','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:27','af6426856815d547d2cd43d971048','Custom SQL','',NULL,'1.9.5'),('TDS-8','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:27','ae42a78f9937c47fd6d45567618899e','Custom SQL (x5)','',NULL,'1.9.5'),('TDS-9','tdiler','src/main/liquibase/liquibase-changelog.xml','2010-12-31 00:58:27','77dcf231a123a94789641ca89c68e2a','Custom SQL','',NULL,'1.9.5');
+/*!40000 ALTER TABLE `databasechangelog` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `databasechangeloglock`
+--
+
+DROP TABLE IF EXISTS `databasechangeloglock`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `databasechangeloglock` (
+  `ID` int(11) NOT NULL,
+  `LOCKED` tinyint(1) NOT NULL,
+  `LOCKGRANTED` datetime DEFAULT NULL,
+  `LOCKEDBY` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `databasechangeloglock`
+--
+
+LOCK TABLES `databasechangeloglock` WRITE;
+/*!40000 ALTER TABLE `databasechangeloglock` DISABLE KEYS */;
+INSERT INTO `databasechangeloglock` VALUES (1,0,NULL,NULL);
+/*!40000 ALTER TABLE `databasechangeloglock` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `entity_tag`
+--
+
+DROP TABLE IF EXISTS `entity_tag`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entity_tag` (
+  `ENTITY_ID` int(11) NOT NULL,
+  `ENTITY_TYPE` varchar(15) NOT NULL,
+  `TAG_ID` int(11) NOT NULL,
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  PRIMARY KEY (`ID`),
+  KEY `FK_TAG` (`TAG_ID`),
+  KEY `FK_TAG_ENTITY_TYPE` (`ENTITY_TYPE`),
+  KEY `UNQ_ENTITY_TAG` (`ENTITY_ID`,`ENTITY_TYPE`,`TAG_ID`),
+  CONSTRAINT `FK_TAG` FOREIGN KEY (`TAG_ID`) REFERENCES `tag_value` (`ID`),
+  CONSTRAINT `FK_TAG_ENTITY_TYPE` FOREIGN KEY (`ENTITY_TYPE`) REFERENCES `entity_type` (`TYPE`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `entity_tag`
+--
+
+LOCK TABLES `entity_tag` WRITE;
+/*!40000 ALTER TABLE `entity_tag` DISABLE KEYS */;
+/*!40000 ALTER TABLE `entity_tag` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `entity_type`
+--
+
+DROP TABLE IF EXISTS `entity_type`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `entity_type` (
+  `TYPE` varchar(15) NOT NULL,
+  PRIMARY KEY (`TYPE`),
+  UNIQUE KEY `UNQ_TYPE` (`TYPE`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `entity_type`
+--
+
+LOCK TABLES `entity_type` WRITE;
+/*!40000 ALTER TABLE `entity_type` DISABLE KEYS */;
+INSERT INTO `entity_type` VALUES ('ARTICLE'),('COMMENT'),('IMAGE');
+/*!40000 ALTER TABLE `entity_type` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `log_article_ratings`
+--
+
+DROP TABLE IF EXISTS `log_article_ratings`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `log_article_ratings` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ARTICLE_ID` int(11) NOT NULL,
+  `VOTE_VALUE` int(10) unsigned NOT NULL,
+  `VOTED_BY` int(11) DEFAULT NULL,
+  `VOTE_TIME` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `IP` varchar(15) DEFAULT NULL,
+  `SESSION_ID` varchar(100) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_LOG_RATINGS_VOTED_BY` (`VOTED_BY`),
+  CONSTRAINT `FK_LOG_RATINGS_VOTED_BY` FOREIGN KEY (`VOTED_BY`) REFERENCES `person` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `log_article_ratings`
+--
+
+LOCK TABLES `log_article_ratings` WRITE;
+/*!40000 ALTER TABLE `log_article_ratings` DISABLE KEYS */;
+/*!40000 ALTER TABLE `log_article_ratings` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER CAL_RATING_OF_ARTICLE AFTER INSERT ON LOG_ARTICLE_RATINGS
+			FOR EACH ROW
+			UPDATE ARTICLE SET RATING=(SELECT SUM(VOTE_VALUE)/COUNT(*) FROM LOG_ARTICLE_RATINGS WHERE ARTICLE_ID=NEW.ARTICLE_ID) WHERE ID=NEW.ARTICLE_ID */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `log_entity_view`
+--
+
+DROP TABLE IF EXISTS `log_entity_view`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `log_entity_view` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `ENTITY_ID` int(11) NOT NULL,
+  `REFERRER` tinytext,
+  `VIEW_TIME` datetime NOT NULL,
+  `IP` varchar(15) DEFAULT NULL,
+  `VIEWED_BY` int(11) DEFAULT NULL,
+  `ENTITY_TYPE` varchar(15) NOT NULL,
+  PRIMARY KEY (`ID`),
+  KEY `FK_VIEWED_BY` (`VIEWED_BY`),
+  KEY `IDX_ENTITY` (`ENTITY_ID`,`ENTITY_TYPE`),
+  CONSTRAINT `FK_VIEWED_BY` FOREIGN KEY (`VIEWED_BY`) REFERENCES `person` (`ID`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `log_entity_view`
+--
+
+LOCK TABLES `log_entity_view` WRITE;
+/*!40000 ALTER TABLE `log_entity_view` DISABLE KEYS */;
+/*!40000 ALTER TABLE `log_entity_view` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!50003 SET @saved_cs_client      = @@character_set_client */ ;
+/*!50003 SET @saved_cs_results     = @@character_set_results */ ;
+/*!50003 SET @saved_col_connection = @@collation_connection */ ;
+/*!50003 SET character_set_client  = utf8 */ ;
+/*!50003 SET character_set_results = utf8 */ ;
+/*!50003 SET collation_connection  = utf8_general_ci */ ;
+/*!50003 SET @saved_sql_mode       = @@sql_mode */ ;
+/*!50003 SET sql_mode              = 'STRICT_TRANS_TABLES,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION' */ ;
+DELIMITER ;;
+/*!50003 CREATE*/ /*!50017 DEFINER=`root`@`localhost`*/ /*!50003 TRIGGER INC_VIEW_OF_ARTICLE BEFORE INSERT ON LOG_ENTITY_VIEW
+			FOR EACH ROW BEGIN IF NEW.ENTITY_TYPE = 'ARTICLE' THEN
+			UPDATE ARTICLE SET VIEW_COUNT=IFNULL(VIEW_COUNT, 0)+1 WHERE ID=NEW.ENTITY_ID;
+			END IF; END */;;
+DELIMITER ;
+/*!50003 SET sql_mode              = @saved_sql_mode */ ;
+/*!50003 SET character_set_client  = @saved_cs_client */ ;
+/*!50003 SET character_set_results = @saved_cs_results */ ;
+/*!50003 SET collation_connection  = @saved_col_connection */ ;
+
+--
+-- Table structure for table `log_likes`
+--
+
+DROP TABLE IF EXISTS `log_likes`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `log_likes` (
+  `ENTITY_ID` int(11) NOT NULL,
+  `ENTITY_TYPE` varchar(15) NOT NULL COMMENT 'ENTITY_TYPE {COMMENT,ARTICLE,IMAGE}',
+  `LIKED_BY` int(11) DEFAULT NULL,
+  `LIKE_TIME` datetime NOT NULL,
+  PRIMARY KEY (`ENTITY_ID`,`ENTITY_TYPE`),
+  KEY `FK_LIKED_BY` (`LIKED_BY`),
+  KEY `FK_LIKE_ENTITY_TYPE` (`ENTITY_TYPE`),
+  CONSTRAINT `FK_LIKED_BY` FOREIGN KEY (`LIKED_BY`) REFERENCES `person` (`ID`),
+  CONSTRAINT `FK_LIKE_ENTITY_TYPE` FOREIGN KEY (`ENTITY_TYPE`) REFERENCES `entity_type` (`TYPE`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `log_likes`
+--
+
+LOCK TABLES `log_likes` WRITE;
+/*!40000 ALTER TABLE `log_likes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `log_likes` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `person`
+--
+
+DROP TABLE IF EXISTS `person`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `person` (
+  `ID` int(11) NOT NULL,
+  `NICKNAME` varchar(15) DEFAULT NULL,
+  `EMAIL` varchar(100) NOT NULL,
+  `FIRSTNAME` varchar(50) DEFAULT NULL,
+  `LASTNAME` varchar(50) DEFAULT NULL,
+  `REGISTERED` tinyint(1) DEFAULT NULL,
+  `PASSWORD` varchar(32) DEFAULT NULL COMMENT 'MD5 Encrypted Password',
+  `CREATED_TIME` datetime NOT NULL,
+  `CREATED_VIA` enum('FORM','COMMENT','ARTICLE_LIKE') DEFAULT NULL COMMENT 'FORM : created by using registeration form\nCOMMENT: created by using comment form',
+  `WEBSITE` varchar(50) DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `EMAIL_UNIQUE` (`EMAIL`),
+  UNIQUE KEY `NICKNAME_UNIQUE` (`NICKNAME`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `person`
+--
+
+LOCK TABLES `person` WRITE;
+/*!40000 ALTER TABLE `person` DISABLE KEYS */;
+INSERT INTO `person` VALUES (1,'tdiler','taner.diler@gmail.com','taner','diler',NULL,NULL,'2010-10-03 12:00:00',NULL,NULL);
+/*!40000 ALTER TABLE `person` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stat_entities`
+--
+
+DROP TABLE IF EXISTS `stat_entities`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stat_entities` (
+  `ENTITY_ID` int(11) NOT NULL,
+  `ENTITY_TYPE` varchar(15) NOT NULL,
+  `COMMENT_COUNT` int(11) DEFAULT '0',
+  `VIEW_COUNT` int(11) DEFAULT '0',
+  `RATING` int(11) DEFAULT '0',
+  `LIKE_COUNT` int(11) DEFAULT '0',
+  PRIMARY KEY (`ENTITY_ID`,`ENTITY_TYPE`),
+  KEY `FK_STAT_ENTITY_TYPE` (`ENTITY_TYPE`),
+  CONSTRAINT `FK_STAT_ENTITY_TYPE` FOREIGN KEY (`ENTITY_TYPE`) REFERENCES `entity_type` (`TYPE`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stat_entities`
+--
+
+LOCK TABLES `stat_entities` WRITE;
+/*!40000 ALTER TABLE `stat_entities` DISABLE KEYS */;
+/*!40000 ALTER TABLE `stat_entities` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `tag_value`
+--
+
+DROP TABLE IF EXISTS `tag_value`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `tag_value` (
+  `ID` int(11) NOT NULL AUTO_INCREMENT,
+  `TEXT` varchar(50) COLLATE utf8_bin DEFAULT NULL,
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `UNQ_TEXT` (`TEXT`),
+  KEY `IDX_TEXT` (`TEXT`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `tag_value`
+--
+
+LOCK TABLES `tag_value` WRITE;
+/*!40000 ALTER TABLE `tag_value` DISABLE KEYS */;
+/*!40000 ALTER TABLE `tag_value` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Temporary table structure for view `tag_value_with_article_count`
+--
+
+DROP TABLE IF EXISTS `tag_value_with_article_count`;
+/*!50001 DROP VIEW IF EXISTS `tag_value_with_article_count`*/;
+SET @saved_cs_client     = @@character_set_client;
+SET character_set_client = utf8;
+/*!50001 CREATE TABLE `tag_value_with_article_count` (
+  `ID` int(11),
+  `TEXT` varchar(50),
+  `COUNT` bigint(21)
+) ENGINE=MyISAM */;
+SET character_set_client = @saved_cs_client;
+
+--
+-- Final view structure for view `tag_value_with_article_count`
+--
+
+/*!50001 DROP TABLE IF EXISTS `tag_value_with_article_count`*/;
+/*!50001 DROP VIEW IF EXISTS `tag_value_with_article_count`*/;
+/*!50001 SET @saved_cs_client          = @@character_set_client */;
+/*!50001 SET @saved_cs_results         = @@character_set_results */;
+/*!50001 SET @saved_col_connection     = @@collation_connection */;
+/*!50001 SET character_set_client      = utf8 */;
+/*!50001 SET character_set_results     = utf8 */;
+/*!50001 SET collation_connection      = utf8_general_ci */;
+/*!50001 CREATE ALGORITHM=UNDEFINED */
+/*!50013 DEFINER=`root`@`localhost` SQL SECURITY DEFINER */
+/*!50001 VIEW `tag_value_with_article_count` AS select `t`.`ID` AS `ID`,`t`.`TEXT` AS `TEXT`,count(`a`.`ID`) AS `COUNT` from ((`tag_value` `t` left join `entity_tag` `et` on((`t`.`ID` = `et`.`TAG_ID`))) left join `article` `a` on(((`et`.`ENTITY_ID` = `a`.`ID`) and (`et`.`ENTITY_TYPE` = 'ARTICLE')))) group by `t`.`ID`,`t`.`TEXT` order by `t`.`TEXT` */;
+/*!50001 SET character_set_client      = @saved_cs_client */;
+/*!50001 SET character_set_results     = @saved_cs_results */;
+/*!50001 SET collation_connection      = @saved_col_connection */;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2011-01-26  8:50:08

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:p="http://www.springframework.org/schema/p"
+       xmlns:security="http://www.springframework.org/schema/security"
+       xsi:schemaLocation="
+       http://www.springframework.org/schema/beans 
+       http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/util 
+       http://www.springframework.org/schema/util/spring-util-3.0.xsd
+       http://www.springframework.org/schema/context
+       http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx
+       http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/aop
+       http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+       http://www.springframework.org/schema/security
+       http://www.springframework.org/schema/security/spring-security-3.0.4.xsd
+       "
+       >
+
+    <context:annotation-config />
+    <context:component-scan base-package="com.tanerdiler" />
+    <tx:annotation-driven/>
+    <aop:aspectj-autoproxy  />
+
+    <bean  id="sessionFactory" class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+        <property name="dataSource" ref="dataSource" />
+		<property name="eventListeners">
+			<map>
+				<entry key="save-update">
+					<bean class="com.tanerdiler.ormlistener.EntityCRUDListener" />
+				</entry>
+			</map>
+		</property>
+        <property name="annotatedClasses">
+            <list>
+                <value>com.tanerdiler.model.Article</value>
+                <value>com.tanerdiler.model.ArticleTag</value>
+                <value>com.tanerdiler.model.Category</value>
+                <value>com.tanerdiler.model.Comment</value>
+                <value>com.tanerdiler.model.CommentAuthor</value>
+                <value>com.tanerdiler.model.ArticleComment</value>
+                <value>com.tanerdiler.model.Person</value>
+                <value>com.tanerdiler.model.TagValue</value>
+                <value>com.tanerdiler.model.view.TagValueWithArticleCount</value>
+                <value>com.tanerdiler.model.ViewLog</value>
+                <value>com.tanerdiler.model.ArticleViewLog</value>
+                <value>com.tanerdiler.model.TagViewLog</value>
+                <value>com.tanerdiler.model.ArticleRatingLog</value>
+            </list>
+        </property>
+
+        <property name="hibernateProperties">
+            <props>
+                <prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+                <prop key="hibernate.show_sql">true</prop>
+            </props>
+        </property>
+    </bean>
+
+    <bean id="dataSource" class="com.mysql.jdbc.jdbc2.optional.MysqlConnectionPoolDataSource">
+        <property name="url" value="jdbc:mysql://db.tanerdiler.com:3306/tanerdiler?useUnicode=true&amp;characterEncoding=UTF8" />
+        <property name="user" value="root" />
+        <property name="password" value="tdiler1280" />
+    </bean>
+
+    <bean id="transactionManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <bean id="wicketApplication" class="com.tanerdiler.web.BlogApplication" />
+    
+</beans>

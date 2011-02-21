@@ -1,0 +1,37 @@
+<wicket:panel>
+<form wicket:id="comment-form">
+<div wicket:id="feedbackpanel"></div>
+<div id="comment-form">
+<div id="author_info">
+	<div class="row">
+		<input wicket:id="comment-firstname" type="text" tabindex="1" size="24" class="textfield" id="firstname" name="firstname">
+		<label class="small" for="author"><wicket:message key="comment.form.firstname"/></label>
+	</div>
+	<div class="row">
+		<input wicket:id="comment-lastname" type="text" tabindex="1" size="24" class="textfield" id="lastname" name="lastname">
+		<label class="small" for="author"><wicket:message key="comment.form.lastname"/></label>
+	</div>
+	<div class="row">
+		<input wicket:id="comment-email" type="text" tabindex="2" size="24" class="textfield" id="email" name="email">
+		<label class="small" for="email"><wicket:message key="comment.form.email"/></label>
+	</div>
+	<div class="row">
+		<input wicket:id="comment-web" type="text" tabindex="3" size="24" class="textfield" id="web" name="web">
+		<label class="small" for="url"><wicket:message key="label.website"/></label>
+	</div>
+</div>
+<!-- comment input -->
+<div class="row">
+	<textarea  wicket:id="comment-comment" cols="50" rows="8" tabindex="4" id="comment" name="comment"></textarea>
+</div>
+
+<!-- comment submit and rss -->
+<div id="submitbox">
+	<div class="submitbutton">
+		<input wicket:id="comment-submit" type="submit" value="Submit Comment" tabindex="5" class="button" id="submit" name="submit">
+	</div>
+	<div class="fixed"></div>
+</div>
+</div>
+</form>
+</wicket:panel>

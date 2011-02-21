@@ -1,0 +1,165 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
+        http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+
+
+	<changeSet author="tdiler" id="TDS-1" runOnChange="true">
+		<comment>DB DDL</comment>
+		<sqlFile path="src/main/liquibase/TDS-1.sql" />
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-2" runOnChange="true">
+		<comment>composite key yapilmasi gerekiyordu</comment>
+		<sql>
+			ALTER TABLE `ENTITY_TAG` ADD COLUMN `ID` INTEGER  NOT NULL AUTO_INCREMENT AFTER `TAG_ID`,
+ 			DROP PRIMARY KEY,
+ 			ADD PRIMARY KEY (`ID`),
+ 			ADD INDEX `UNQ_ENTITY_TAG`(`ENTITY_ID`, `ENTITY_TYPE`, `TAG_ID`);
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-3" runOnChange="true">
+		<sql>
+			CREATE VIEW TAG_VALUE_WITH_ARTICLE_COUNT AS 
+			select T.ID AS ID,T.TEXT AS TEXT,count(A.ID) AS COUNT from TAG_VALUE T 
+			left join ENTITY_TAG ET on T.ID = ET.TAG_ID 
+			left join ARTICLE A on ET.ENTITY_ID = A.ID and ET.ENTITY_TYPE = 'ARTICLE' 
+			group by T.ID,T.TEXT order by T.TEXT
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-4">
+		<sql>
+			CREATE  TABLE `COMMENT_AUTHOR` (
+  			`ID` INT NOT NULL AUTO_INCREMENT ,
+			`FIRSTNAME` VARCHAR(50) NOT NULL ,
+			`LASTNAME` VARCHAR(50) NOT NULL ,
+			`EMAIL` VARCHAR(100) NOT NULL ,
+			`WEBSITE` VARCHAR(50) NULL ,
+			PRIMARY KEY (`ID`)) ENGINE = InnoDB
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-5">
+		<sql>
+			ALTER TABLE `COMMENT` CHANGE COLUMN `WRITTEN_BY` `PERSON_ID` INTEGER  NOT NULL,
+ 			ADD COLUMN `AUTHOR_ID` INTEGER  DEFAULT NULL AFTER `PARENT_ID`
+			, DROP INDEX `FK_COMMENT_WRITTEN_BY`,
+ 			DROP FOREIGN KEY `FK_COMMENT_WRITTEN_BY`;
+		</sql>
+	</changeSet>
+	<changeSet  author="tdiler" id="TDS-6">
+		<sql>
+			ALTER TABLE `COMMENT` ADD CONSTRAINT FK_COMMENT_PERSON_ID FOREIGN KEY (PERSON_ID) REFERENCES PERSON(ID),
+			ADD CONSTRAINT FK_COMMENT_AUTHOR_ID FOREIGN KEY (AUTHOR_ID) REFERENCES COMMENT_AUTHOR(ID);
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-7">
+		<sql>ALTER TABLE `PERSON` ADD COLUMN WEBSITE VARCHAR(50) NULL;</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-8">
+		<sql>insert into CATEGORY values(1,null,'Blog');</sql>
+		<sql>insert into CATEGORY values(2,1,'Java');</sql>
+		<sql>insert into CATEGORY values(3,1,'Wicket');</sql>
+		<sql>insert into CATEGORY values(4,1,'Design Patterns');</sql>
+		<sql>insert into CATEGORY values(5,1,'Spring');</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-9">
+		<sql>insert into PERSON(ID,NICKNAME,EMAIL,FIRSTNAME,LASTNAME,CREATED_TIME) values(1,'tdiler','taner.diler@gmail.com','taner','diler','2010-10-03 12:00:00');</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-10">
+		<sql>ALTER TABLE`COMMENT` MODIFY COLUMN `PERSON_ID` INTEGER  DEFAULT NULL;</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-11">
+		<sql>ALTER TABLE `LOG_ARTICLE_VIEW` MODIFY COLUMN `ID` INTEGER NOT NULL AUTO_INCREMENT;</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-12">
+		<sql>CREATE VIEW ARTICLE_WITH_STATS as SELECT article.*, (SELECT COUNT(*) FROM LOG_ARTICLE_VIEW WHERE ARTICLE_ID=article.ID) AS VIEW_COUNT FROM ARTICLE article </sql>
+	</changeSet>
+	<changeSet  author="tdiler" id="TDS-13">
+		<sql>ALTER TABLE `ARTICLE` ADD COLUMN `VIEW_COUNT` INTEGER DEFAULT 0 AFTER `CREATED_TIME`;</sql>
+		<sql>
+			CREATE TRIGGER INC_VIEW_OF_ARTICLE BEFORE INSERT ON LOG_ARTICLE_VIEW
+			FOR EACH ROW
+			UPDATE ARTICLE SET VIEW_COUNT=VIEW_COUNT+1 WHERE ID=NEW.ARTICLE_ID; 
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-14" failOnError="false">
+		<sql>insert into ENTITY_TYPE values('ARTICLE');</sql>
+		<sql>insert into ENTITY_TYPE values('COMMENT');</sql>
+		<sql>insert into ENTITY_TYPE values('IMAGE');</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-15">
+		<sql>CREATE TABLE `LOG_ARTICLE_RATINGS` (
+			  `ID` INTEGER NOT NULL AUTO_INCREMENT,
+			  `ARTICLE_ID` INTEGER NOT NULL,
+			  `VOTE_VALUE` INTEGER UNSIGNED NOT NULL,
+			  `VOTED_BY` INTEGER,
+			  `VOTE_TIME` TIMESTAMP NOT NULL,
+			  `IP` VARCHAR(15),
+			  `SESSION_ID` VARCHAR(100) NOT NULL,
+			  PRIMARY KEY (`ID`),
+			  CONSTRAINT `FK_LOG_RATINGS_VOTED_BY` FOREIGN KEY `FK_LOG_RATINGS_VOTED_BY` (`VOTED_BY`)
+			    REFERENCES `PERSON` (`ID`)
+			    ON DELETE RESTRICT
+			    ON UPDATE RESTRICT
+			) ENGINE = InnoDB;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-16">
+		<preConditions onFail="CONTINUE"><viewExists viewName="ARTICLE_WITH_STATS"/></preConditions>
+		<sql>DROP VIEW ARTICLE_WITH_STATS</sql>
+	</changeSet>
+	<changeSet  author="tdiler" id="TDS-18">
+		<sql>ALTER TABLE `ARTICLE` ADD COLUMN `RATING` FLOAT DEFAULT 0 AFTER `VIEW_COUNT`;</sql>
+		<sql>
+			CREATE TRIGGER CAL_RATING_OF_ARTICLE AFTER INSERT ON LOG_ARTICLE_RATINGS
+			FOR EACH ROW
+			UPDATE ARTICLE SET RATING=(SELECT SUM(VOTE_VALUE)/COUNT(*) FROM LOG_ARTICLE_RATINGS WHERE ARTICLE_ID=NEW.ARTICLE_ID) WHERE ID=NEW.ARTICLE_ID; 
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-19">
+		<sql>
+			ALTER TABLE `log_article_view` CHANGE COLUMN `ARTICLE_ID` `ENTITY_ID`
+			INT(11) NOT NULL,
+			ADD COLUMN `ENTITY_TYPE` VARCHAR(15) NOT NULL AFTER `VIEWED_BY`
+			, DROP INDEX `FK_VIEW_ARTICLE`,
+			ADD INDEX `IDX_ENTITY`(`ENTITY_ID`, `ENTITY_TYPE`),
+			DROP FOREIGN KEY `FK_VIEW_ARTICLE`;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-20">
+		<sql>
+			ALTER TABLE `log_article_view` RENAME TO `log_entity_view`;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-21" failOnError="false">
+		<sql>
+			DROP TRIGGER INC_VIEW_OF_ARTICLE;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-22">
+		<sql splitStatements="false">
+			CREATE TRIGGER INC_VIEW_OF_ARTICLE BEFORE INSERT ON LOG_ENTITY_VIEW
+			FOR EACH ROW BEGIN IF NEW.ENTITY_TYPE = 'ARTICLE' THEN
+			UPDATE ARTICLE SET VIEW_COUNT=VIEW_COUNT+1 WHERE ID=NEW.ENTITY_ID;
+			END IF; END;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-23">
+		<sql>
+			ALTER TABLE `article` MODIFY COLUMN `VIEW_COUNT` INT(10) UNSIGNED DEFAULT 0;
+		</sql>
+	</changeSet>
+	<changeSet author="tdiler" id="TDS-24">
+		<sql>
+			DROP TRIGGER INC_VIEW_OF_ARTICLE;
+		</sql>
+		<sql splitStatements="false">
+			CREATE TRIGGER INC_VIEW_OF_ARTICLE BEFORE INSERT ON LOG_ENTITY_VIEW
+			FOR EACH ROW BEGIN IF NEW.ENTITY_TYPE = 'ARTICLE' THEN
+			UPDATE ARTICLE SET VIEW_COUNT=IFNULL(VIEW_COUNT, 0)+1 WHERE ID=NEW.ENTITY_ID;
+			END IF; END;
+		</sql>
+	</changeSet>
+</databaseChangeLog>
